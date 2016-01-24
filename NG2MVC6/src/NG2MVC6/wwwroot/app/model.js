@@ -1,10 +1,10 @@
-var Shipment = (function () {
-    function Shipment(id, origin, destination, shippedDate) {
+var Person = (function () {
+    function Person(id, firstName, lastName, dateOfBirth) {
         this.id = id;
-        this.origin = origin;
-        this.destination = destination;
-        this.shippedDate = shippedDate;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
     }
-    return Shipment;
+    return Person;
 })();
-exports.Shipment = Shipment;
+exports.Person = Person;

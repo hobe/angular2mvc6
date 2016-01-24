@@ -1,8 +1,8 @@
-﻿export class Shipment {
+﻿export class Person {
     constructor(
         public id: number,
-        public origin: string,
-        public destination: string,
-        public shippedDate: any
+        public firstName: string,
+        public lastName: string,
+        public dateOfBirth: any
         ) { }
 }

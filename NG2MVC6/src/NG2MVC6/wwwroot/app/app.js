@@ -15,25 +15,25 @@ require('rxjs/add/operator/map');
 var AppComponent = (function () {
     function AppComponent(http) {
         this.http = http;
-        this.shipments = [];
-        //this.getData();
+        this.people = [];
+        this.getData();
     }
     AppComponent.prototype.getData = function () {
         var _this = this;
-        this.http.get('http://localhost:2949/api/data')
+        this.http.get('http://localhost:14373/api/data')
             .map(function (res) { return res.json(); })
-            .map(function (shipments) {
+            .map(function (people) {
             var result = [];
-            if (shipments) {
-                shipments.forEach(function (shipment) {
-                    result.push(new model_1.Shipment(shipment.id, shipment.origin, shipment.destination, new Date(shipment.shippedDate)));
+            if (people) {
+                people.forEach(function (person) {
+                    result.push(new model_1.Person(person.id, person.firstName, person.lastName, new Date(person.dateOfBirth)));
                 });
             }
             return result;
         }).
             subscribe(function (data) {
-            _this.shipments = data;
-            console.log(_this.shipments);
+            _this.people = data;
+            console.log(_this.people);
         }, function (err) { return console.log(err); });
     };
     AppComponent = __decorate([
