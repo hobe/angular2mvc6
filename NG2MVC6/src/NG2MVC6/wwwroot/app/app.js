@@ -10,28 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var browser_1 = require('angular2/platform/browser');
 var core_1 = require('angular2/core');
 var http_1 = require('angular2/http');
-var model_1 = require('./model');
+var dataService_1 = require('./dataService');
 require('rxjs/add/operator/map');
 var AppComponent = (function () {
-    function AppComponent(http) {
-        this.http = http;
+    function AppComponent(dataSvc) {
+        this.dataSvc = dataSvc;
         this.people = [];
         this.getData();
     }
     AppComponent.prototype.getData = function () {
         var _this = this;
-        this.http.get('http://localhost:14373/api/data')
-            .map(function (res) { return res.json(); })
-            .map(function (people) {
-            var result = [];
-            if (people) {
-                people.forEach(function (person) {
-                    result.push(new model_1.Person(person.id, person.firstName, person.lastName, new Date(person.dateOfBirth)));
-                });
-            }
-            return result;
-        }).
-            subscribe(function (data) {
+        this.dataSvc.getData()
+            .subscribe(function (data) {
             _this.people = data;
             console.log(_this.people);
         }, function (err) { return console.log(err); });
@@ -43,8 +33,8 @@ var AppComponent = (function () {
         core_1.View({
             templateUrl: 'app/partials/app.html'
         }), 
-        __metadata('design:paramtypes', [http_1.Http])
+        __metadata('design:paramtypes', [dataService_1.DataService])
     ], AppComponent);
     return AppComponent;
 })();
-browser_1.bootstrap(AppComponent, [http_1.HTTP_PROVIDERS]);
+browser_1.bootstrap(AppComponent, [http_1.HTTP_PROVIDERS, dataService_1.DataService]);
