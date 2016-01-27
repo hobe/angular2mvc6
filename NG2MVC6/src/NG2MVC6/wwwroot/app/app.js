@@ -15,16 +15,31 @@ require('rxjs/add/operator/map');
 var AppComponent = (function () {
     function AppComponent(dataSvc) {
         this.dataSvc = dataSvc;
-        this.people = [];
         this.getData();
     }
     AppComponent.prototype.getData = function () {
         var _this = this;
+        this.isLoading = true;
         this.dataSvc.getData()
-            .subscribe(function (data) {
-            _this.people = data;
-            console.log(_this.people);
-        }, function (err) { return console.log(err); });
+            .subscribe(function (people) {
+            _this.people = people;
+            console.log(_this.people.length);
+        }, function (err) { return console.log(err); }, function () { return _this.isLoading = false; });
+    };
+    AppComponent.prototype.selectAll = function () {
+        this.people.forEach(function (p) { return p.IsSelected = true; });
+    };
+    AppComponent.prototype.showDetails = function (person) {
+        alert(person.LastName + ' is ' + person.IsSelected);
+    };
+    AppComponent.prototype.removeItems = function () {
+        var newList = [];
+        this.people.forEach(function (p) {
+            if (!p.IsSelected) {
+                newList.push(p);
+            }
+        });
+        this.people = newList;
     };
     AppComponent = __decorate([
         core_1.Component({

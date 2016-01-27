@@ -1,8 +1,11 @@
-﻿export class Person {
-    constructor(
-        public id: number,
-        public firstName: string,
-        public lastName: string,
-        public dateOfBirth: any
-        ) { }
+﻿export class Person extends Selectable {
+    public ID: number;
+    public FirstName: string;
+    public LastName: string;
+    public DateOfBirth: any;
 }
+
+export class Selectable {
+    public IsSelected: boolean;
+}
+

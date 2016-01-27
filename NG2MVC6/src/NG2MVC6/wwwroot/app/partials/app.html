@@ -1,7 +1,16 @@
 ﻿<h1>Angular is up and running</h1>
 
+<button (click)="getData()" >refresh</button><p [hidden]="!isLoading">Loading...</p>
+
+<button (click)="selectAll()" >select all</button>
+
 <div *ngFor="#person of people">
-    {{person.dateOfBirth | date:'yyyy-MM-dd HH:mm'}}
-    {{person.firstName}}
-    {{person.lastName}}
+    <input [(ngModel)]="person.IsSelected" type="checkbox" />
+    {{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}
+    {{person.FirstName}}
+    {{person.LastName}}
+    <button (click)="showDetails(person)">select</button>
 </div>
+
+
+<button (click)="removeItems()">delete selected</button>

@@ -30,11 +30,12 @@ namespace NG2MVC6
             // Add framework services.
             services
                  .AddMvc()
-                 .AddJsonOptions(options =>
-                 {
-                     options.SerializerSettings.ContractResolver =
-                     new CamelCasePropertyNamesContractResolver();
-                 });
+                 //.AddJsonOptions(options =>
+                 //{
+                 //    options.SerializerSettings.ContractResolver =
+                 //    new CamelCasePropertyNamesContractResolver();
+                 //})
+                 ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

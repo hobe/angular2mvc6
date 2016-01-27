@@ -16,22 +16,19 @@ namespace NG2MVC6.Controllers
         [HttpGet]
         public IEnumerable<Person> Get()
         {
-            return new List<Person> {
-                new Person
-                {
-                    DateOfBirth = DateTime.Now,
-                    FirstName ="Bernhard",
-                    LastName ="Hochgatterer",
-                    Id = 1
-                },
-                new Person
-                {
-                    DateOfBirth = DateTime.Now,
-                    FirstName ="Homer",
-                    LastName ="Simpson",
-                    Id = 2
-                }
+            var result = new List<Person>();
+            for (int i = 0; i < 50; i++)
+            {
+                result.Add(
+                    new Person
+                    {
+                        DateOfBirth = DateTime.Now.AddDays(i),
+                        FirstName = "First " + i,
+                        LastName = "Last " + i,
+                        Id = i
+                    });
             };
+            return result;
         }
 
     }

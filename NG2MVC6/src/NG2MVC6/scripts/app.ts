@@ -12,21 +12,38 @@ import 'rxjs/add/operator/map';
     templateUrl: 'app/partials/app.html'
 })
 class AppComponent {
-    people: Array<Person> = []; 
+    public people: Array<Person>;
+    isLoading: boolean;
 
     constructor(public dataSvc : DataService) {
         this.getData();
     }
 
     getData() {
+        this.isLoading = true;
         this.dataSvc.getData()
-            .subscribe(
-                data => {
-                    this.people = data;
-                    console.log(this.people);
-                },
-                err => console.log(err)
-            );
+            .subscribe((people: Array<Person>) => {
+                this.people = people;
+                console.log(this.people.length);
+            },
+            err => console.log(err),
+            () => this.isLoading = false );
+    }
+
+    selectAll() {
+        this.people.forEach(p => p.IsSelected = true);
+    }
+
+    showDetails(person: Person) {
+        alert(person.LastName + ' is ' + person.IsSelected);
+    }
+
+    removeItems() {
+        let newList : Array<Person> = [];
+        this.people.forEach(p => {
+            if (!p.IsSelected) { newList.push(p); }
+        });
+        this.people = newList;
     }
 }
 

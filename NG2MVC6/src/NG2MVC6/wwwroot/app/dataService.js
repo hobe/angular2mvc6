@@ -9,23 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var http_1 = require('angular2/http');
 var core_1 = require('angular2/core');
-var model_1 = require('./model');
 require('rxjs/add/operator/map');
 var DataService = (function () {
     function DataService(http) {
         this.http = http;
     }
     DataService.prototype.getData = function () {
-        return this.http.get('http://localhost:14373/api/data')
+        return this.http
+            .get('/api/data')
             .map(function (res) { return res.json(); })
             .map(function (people) {
-            var result = [];
             if (people) {
                 people.forEach(function (person) {
-                    result.push(new model_1.Person(person.id, person.firstName, person.lastName, new Date(person.dateOfBirth)));
+                    person.DateOfBirth = new Date(person.DateOfBirth);
                 });
             }
-            return result;
+            return people;
         });
     };
     DataService = __decorate([
