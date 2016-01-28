@@ -1,6 +1,6 @@
 ﻿import { Http, HTTP_PROVIDERS, Response } from 'angular2/http';
 import { Injectable } from 'angular2/core';
-import { Person } from './model';
+import { Person } from './model/Person';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 

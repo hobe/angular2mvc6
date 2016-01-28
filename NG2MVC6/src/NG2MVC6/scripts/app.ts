@@ -1,7 +1,7 @@
 ﻿import { bootstrap } from 'angular2/platform/browser';
 import { Component, View } from 'angular2/core';
 import { Http, HTTP_PROVIDERS, Response } from 'angular2/http';
-import { Person } from './model';
+import { Person } from './model/Person';
 import { DataService } from './dataService';
 import 'rxjs/add/operator/map';
 
@@ -12,11 +12,18 @@ import 'rxjs/add/operator/map';
     templateUrl: 'app/partials/app.html'
 })
 class AppComponent {
+
     public people: Array<Person>;
+    selectedPerson: Person;
     isLoading: boolean;
 
-    constructor(public dataSvc : DataService) {
+    constructor(public dataSvc: DataService) {
+        this.selectedPerson = new Person();
         this.getData();
+    }
+
+    selectAll() {
+        this.people.forEach(p => p.IsSelected = true);
     }
 
     getData() {
@@ -30,12 +37,9 @@ class AppComponent {
             () => this.isLoading = false );
     }
 
-    selectAll() {
-        this.people.forEach(p => p.IsSelected = true);
-    }
 
     showDetails(person: Person) {
-        alert(person.LastName + ' is ' + person.IsSelected);
+        this.selectedPerson = person;
     }
 
     removeItems() {

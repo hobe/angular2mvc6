@@ -10,13 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var browser_1 = require('angular2/platform/browser');
 var core_1 = require('angular2/core');
 var http_1 = require('angular2/http');
+var Person_1 = require('./model/Person');
 var dataService_1 = require('./dataService');
 require('rxjs/add/operator/map');
 var AppComponent = (function () {
     function AppComponent(dataSvc) {
         this.dataSvc = dataSvc;
+        this.selectedPerson = new Person_1.Person();
         this.getData();
     }
+    AppComponent.prototype.selectAll = function () {
+        this.people.forEach(function (p) { return p.IsSelected = true; });
+    };
     AppComponent.prototype.getData = function () {
         var _this = this;
         this.isLoading = true;
@@ -26,11 +31,8 @@ var AppComponent = (function () {
             console.log(_this.people.length);
         }, function (err) { return console.log(err); }, function () { return _this.isLoading = false; });
     };
-    AppComponent.prototype.selectAll = function () {
-        this.people.forEach(function (p) { return p.IsSelected = true; });
-    };
     AppComponent.prototype.showDetails = function (person) {
-        alert(person.LastName + ' is ' + person.IsSelected);
+        this.selectedPerson = person;
     };
     AppComponent.prototype.removeItems = function () {
         var newList = [];
