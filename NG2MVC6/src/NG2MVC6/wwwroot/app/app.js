@@ -7,51 +7,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var browser_1 = require('angular2/platform/browser');
 var core_1 = require('angular2/core');
-var http_1 = require('angular2/http');
-var Person_1 = require('./model/Person');
-var dataService_1 = require('./dataService');
+var router_1 = require('angular2/router');
+var people_1 = require('./people/people');
+var demo2_1 = require('./demo2/demo2');
 require('rxjs/add/operator/map');
 var AppComponent = (function () {
-    function AppComponent(dataSvc) {
-        this.dataSvc = dataSvc;
-        this.selectedPerson = new Person_1.Person();
-        this.getData();
+    function AppComponent(router, location) {
+        this.router = router;
+        this.location = location;
     }
-    AppComponent.prototype.selectAll = function () {
-        this.people.forEach(function (p) { return p.IsSelected = true; });
-    };
-    AppComponent.prototype.getData = function () {
-        var _this = this;
-        this.isLoading = true;
-        this.dataSvc.getData()
-            .subscribe(function (people) {
-            _this.people = people;
-            console.log(_this.people.length);
-        }, function (err) { return console.log(err); }, function () { return _this.isLoading = false; });
-    };
-    AppComponent.prototype.showDetails = function (person) {
-        this.selectedPerson = person;
-    };
-    AppComponent.prototype.removeItems = function () {
-        var newList = [];
-        this.people.forEach(function (p) {
-            if (!p.IsSelected) {
-                newList.push(p);
-            }
-        });
-        this.people = newList;
+    AppComponent.prototype.getLinkStyle = function (path) {
+        return this.location.path() === path;
     };
     AppComponent = __decorate([
         core_1.Component({
-            selector: "my-app"
+            selector: "demo-app",
+            directives: [router_1.ROUTER_DIRECTIVES],
+            templateUrl: 'app/app.html'
         }),
-        core_1.View({
-            templateUrl: 'app/partials/app.html'
-        }), 
-        __metadata('design:paramtypes', [dataService_1.DataService])
+        router_1.RouteConfig([
+            new router_1.Route({ path: '/', component: people_1.PeopleComponent, name: 'Home' }),
+            new router_1.Route({ path: '/demo2', component: demo2_1.Demo2Component, name: 'Demo2' })
+        ]), 
+        __metadata('design:paramtypes', [router_1.Router, router_1.Location])
     ], AppComponent);
     return AppComponent;
 })();
-browser_1.bootstrap(AppComponent, [http_1.HTTP_PROVIDERS, dataService_1.DataService]);
+exports.AppComponent = AppComponent;

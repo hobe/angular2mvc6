@@ -1,11 +1,9 @@
-﻿<h1>Angular is up and running</h1>
+﻿<h1>People</h1>
 
-<button (click)="getData()" >refresh</button><p [hidden]="!isLoading">Loading...</p>
-
-<button (click)="selectAll()" >select all</button>
+<button (click)="getData()">refresh</button><p [hidden]="!isLoading">Loading...</p>
+<button (click)="selectAll()">select all</button>
 <button (click)="removeItems()">delete selected</button>
 <p>{{people?.length}} items found</p> <!-- Elivs operator, because people is undefined before initial data load -->
-
 <div *ngFor="#person of people">
     <input [(ngModel)]="person.IsSelected" type="checkbox" />
     {{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}
@@ -13,7 +11,6 @@
     {{person.LastName}}
     <button (click)="showDetails(person)">select</button>
 </div>
-
 <div id="details">
     <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
@@ -21,5 +18,4 @@
 
     <!--<input type="date" [(ngModel)]="selectedPerson.DateOfBirth" />-->
 </div>
-
 

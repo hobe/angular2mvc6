@@ -1,54 +1,31 @@
-﻿import { bootstrap } from 'angular2/platform/browser';
-import { Component, View } from 'angular2/core';
-import { Http, HTTP_PROVIDERS, Response } from 'angular2/http';
-import { Person } from './model/Person';
-import { DataService } from './dataService';
+﻿import { Component, View } from 'angular2/core';
+import {ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteConfig, Router, Location, Route} from 'angular2/router';
+import { PeopleComponent } from './people/people';
+import { Demo2Component } from './demo2/demo2';
 import 'rxjs/add/operator/map';
 
 @Component({
-    selector: "my-app" 
+    selector: "demo-app",
+    directives: [ROUTER_DIRECTIVES],
+    templateUrl: 'app/app.html'
 })
-@View({
-    templateUrl: 'app/partials/app.html'
-})
-class AppComponent {
+@RouteConfig([
+        new Route({ path: '/', component: PeopleComponent, name: 'Home' }),
+        new Route({ path: '/demo2', component: Demo2Component, name: 'Demo2' })
+])
+export class AppComponent {
 
-    public people: Array<Person>;
-    selectedPerson: Person;
-    isLoading: boolean;
+    router: Router;
+    location: Location;
 
-    constructor(public dataSvc: DataService) {
-        this.selectedPerson = new Person();
-        this.getData();
+    constructor(router: Router, location: Location) {
+        this.router = router;
+        this.location = location;
     }
 
-    selectAll() {
-        this.people.forEach(p => p.IsSelected = true);
+    getLinkStyle(path) {
+        return this.location.path() === path;
     }
-
-    getData() {
-        this.isLoading = true;
-        this.dataSvc.getData()
-            .subscribe((people: Array<Person>) => {
-                this.people = people;
-                console.log(this.people.length);
-            },
-            err => console.log(err),
-            () => this.isLoading = false );
-    }
-
-
-    showDetails(person: Person) {
-        this.selectedPerson = person;
-    }
-
-    removeItems() {
-        let newList : Array<Person> = [];
-        this.people.forEach(p => {
-            if (!p.IsSelected) { newList.push(p); }
-        });
-        this.people = newList;
-    }
+  
 }
-
-bootstrap(AppComponent, [HTTP_PROVIDERS, DataService]);
