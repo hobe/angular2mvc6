@@ -6,6 +6,7 @@
 /// <reference path="app/model.js" />
 /// <reference path="app/model/Person.js" />
 /// <reference path="app/model/Selectable.js" />
+/// <reference path="app/people/people.js" />
 /// <reference path="js/site.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />
 /// <reference path="lib/jquery/dist/jquery.js" />
