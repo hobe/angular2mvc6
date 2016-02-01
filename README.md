@@ -9,11 +9,12 @@ Features:
 Roadmap:
 * EF7 data store
 * Master/Detail Views
-* Grid-Views (including Sort/Filter/etc.) 
+* Grid-Views (including Sort/Filter/Paging/etc.) 
 * List-Views
 * Integrating UI library (Office UI Fabric, Ng2-Bootstrap, etc. => needs to be evaluated)
 * Authentication
 * Forms validation
+* Localization support
 * Error Handling/Logging
 * Unit Testing
 * Other common Line Of Business Application concerns
