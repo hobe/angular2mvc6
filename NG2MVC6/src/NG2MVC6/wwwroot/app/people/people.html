@@ -4,18 +4,26 @@
 <button (click)="selectAll()">select all</button>
 <button (click)="removeItems()">delete selected</button>
 <p>{{people?.length}} items found</p> <!-- Elivs operator, because people is undefined before initial data load -->
-<div *ngFor="#person of people">
-    <input [(ngModel)]="person.IsSelected" type="checkbox" />
-    {{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}
-    {{person.FirstName}}
-    {{person.LastName}}
-    <button (click)="showDetails(person)">select</button>
-</div>
-<div id="details">
-    <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
-    <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
-    <!--<input type="date" [(ngModel)]="selectedPerson.DateOfBirth" />-->
+<div class="row">
+    <!-- MASTER -->
+    <div class="col-md-6">
+        <div *ngFor="#person of people">
+            <input [(ngModel)]="person.IsSelected" type="checkbox" />
+            {{person.LastName}}
+            <button (click)="showDetails(person)">select</button>
+        </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div id="details" class="col-md-6">
+        <input type="text" [(ngModel)]="selectedPerson.LastName" />
+
+        <input type="text" [(ngModel)]="selectedPerson.LastName" />
+
+        <!--<input type="date" [(ngModel)]="selectedPerson.DateOfBirth" />-->
+    </div>
 </div>
+
 
