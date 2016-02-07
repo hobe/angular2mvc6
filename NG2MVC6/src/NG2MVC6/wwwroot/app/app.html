@@ -1,17 +1,29 @@
 ﻿<h1>Angular is up and running</h1>
 
+<div class="ms-NavBar">
+    <div class="ms-NavBar-openMenu js-openMenu"></div>
+    <div class="ms-Overlay"></div>
+    <ul class="ms-NavBar-items">
+        <li class="ms-NavBar-item" [class.is-selected]="getLinkStyle('')">
+            <a [routerLink]="['/Home']" class="ms-NavBar-link" href="#">People</a>
+        </li>
 
-<div class="container">
+        <li class="ms-NavBar-item" [class.is-selected]="getLinkStyle('/demo2')">
+            <a [routerLink]="['/Demo2']"  class="ms-NavBar-link"  href="#">Demo2</a>
+        </li>
+    </ul>
+</div>
+
+<!--<div class="container">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div>
                 <ul class="nav navbar-nav">
-                    <li  [class.active]="getLinkStyle('')"><a [routerLink]="['/Home']" class="link">People</a></li>
+                    <li [class.active]="getLinkStyle('')"><a [routerLink]="['/Home']" class="link">People</a></li>
                     <li [class.active]="getLinkStyle('#/demo2')"><a [routerLink]="['/Demo2']" class="link">Demo2</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-</div>
+</div>-->
 <router-outlet></router-outlet>
-
