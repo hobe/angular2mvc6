@@ -3,7 +3,8 @@
 	"name": "ASP.NET",
   "private": true,
   "dependencies": {
-    "angular2": "^2.0.0-beta.1",
+    "angular2": "^2.0.0-beta.3",
+    "office-ui-fabric": "^2.0.1",
     "es6-shim": "0.33.13",
     "systemjs": "0.19.6",
     "reflect-metadata": "^0.1.2",

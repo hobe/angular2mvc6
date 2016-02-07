@@ -20,7 +20,11 @@ var libs = [
     paths.npm + 'es6-shim/es6-shim.js',
     paths.npm + 'systemjs/dist/system.js',
     paths.npm + 'systemjs/dist/system-polyfills.js',
-    paths.npm + 'angular2/bundles/router.dev.js'
+    paths.npm + 'angular2/bundles/router.dev.js',
+
+    // css
+    paths.npm + 'office-ui-fabric/dist/css/fabric.min.css',
+    paths.npm + 'office-ui-fabric/dist/css/fabric.components.min.css'
 ];
 
 paths.js = paths.webroot + "js/**/*.js";

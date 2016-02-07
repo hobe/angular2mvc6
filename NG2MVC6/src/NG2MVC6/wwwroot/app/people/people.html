@@ -8,16 +8,19 @@
 
 <div class="row">
     <!-- MASTER -->
-    <div class="col-md-6">
-        <div *ngFor="#person of people">
-            <input [(ngModel)]="person.IsSelected" type="checkbox" />
-            {{person.LastName}}
-            <button (click)="showDetails(person)">select</button>
+    <div class="col-md-3">
+
+
+        <div class="ms-ListItem is-selectable" *ngFor="#person of people" (click)="showDetails(person)" [class.is-selected]="person.IsSelected">
+            <span class="ms-ListItem-primaryText">{{person.LastName}}</span> <span class="ms-ListItem-secondaryText">{{person.FirstName}}</span> <span class="ms-ListItem-tertiaryText">{{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}</span> 
+            <div class="ms-ListItem-selectionTarget js-toggleSelection" (click)="person.IsSelected=!person.IsSelected"></div>
         </div>
     </div>
 
+
     <!-- DETAIL -->
-    <div id="details" class="col-md-6">
+    <div id="details" class="col-md-9">
+        <p class="ms-font-xxl">Details</p>
         <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
         <input type="text" [(ngModel)]="selectedPerson.LastName" />
