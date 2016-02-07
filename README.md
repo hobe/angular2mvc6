@@ -1,10 +1,11 @@
 # angular2mvc6
-Visual Studio 2015 Angular2 (Beta 01) Sample with MVC6 (ASP.NET Core, formerly known as ASP.NET 5 or ASP.NET vNext)
+Visual Studio 2015 Angular2 (Beta 03) Sample with MVC6 (ASP.NET Core, formerly known as ASP.NET 5 or ASP.NET vNext)
 
 
 Features:
 * Anguar2 UI Routing
 * Fetching Data from Web API endpoint with custom service
+* Office-UI-Fabric UI (Selectable List-View)
 
 
 Roadmap:
