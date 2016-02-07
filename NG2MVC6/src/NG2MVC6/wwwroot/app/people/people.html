@@ -1,15 +1,18 @@
-﻿<h1>People</h1>
+﻿
+<button class="ms-Button" (click)="getData()"><span class="ms-Button-icon"><i class="ms-Icon ms-Icon--plus"></i></span> <span class="ms-Button-label">refresh</span> <span class="ms-Button-description">Refresh data from server</span></button>
+<button class="ms-Button" (click)="selectAll()"><span class="ms-Button-icon"><i class="ms-Icon ms-Icon--plus"></i></span> <span class="ms-Button-label">select all</span> <span class="ms-Button-description">Mark all items as selected</span></button>
+<button class="ms-Button  ms-Button--primary" (click)="removeItems()"><span class="ms-Button-icon"><i class="ms-Icon ms-Icon--plus"></i></span> <span class="ms-Button-label">delete selected</span> <span class="ms-Button-description">Delete selected items from list</span></button>
 
-<button (click)="getData()">refresh</button><p [hidden]="!isLoading">Loading...</p>
-<button (click)="selectAll()">select all</button>
-<button (click)="removeItems()">delete selected</button>
-<p>{{people?.length}} items found</p> <!-- Elivs operator, because people is undefined before initial data load -->
+
+<label [hidden]="!isLoading">Loading...</label>
+
+<label class="ms-Label">{{people?.length}} items found</label><!-- Elivs operator, because people is undefined before initial data load -->
 
 
 <div class="row">
     <!-- MASTER -->
     <div class="col-md-3">
-
+        <p class="ms-font-xxl">Master</p>
 
         <div class="ms-ListItem is-selectable" *ngFor="#person of people" (click)="showDetails(person)" [class.is-selected]="person.IsSelected">
             <span class="ms-ListItem-primaryText">{{person.LastName}}</span> <span class="ms-ListItem-secondaryText">{{person.FirstName}}</span> <span class="ms-ListItem-tertiaryText">{{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}</span> 
@@ -20,7 +23,7 @@
 
     <!-- DETAIL -->
     <div id="details" class="col-md-9">
-        <p class="ms-font-xxl">Details</p>
+        <p class="ms-font-xxl">Detail</p>
         <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
         <input type="text" [(ngModel)]="selectedPerson.LastName" />
