@@ -13,10 +13,11 @@ var TimerObservable = (function (_super) {
     function TimerObservable(dueTime, period, scheduler) {
         if (dueTime === void 0) { dueTime = 0; }
         _super.call(this);
-        this.period = -1;
+        this.period = period;
+        this.scheduler = scheduler;
         this.dueTime = 0;
         if (isNumeric_1.isNumeric(period)) {
-            this.period = Number(period) < 1 && 1 || Number(period);
+            this._period = Number(period) < 1 && 1 || Number(period);
         }
         else if (isScheduler_1.isScheduler(period)) {
             scheduler = period;
@@ -25,9 +26,8 @@ var TimerObservable = (function (_super) {
             scheduler = asap_1.asap;
         }
         this.scheduler = scheduler;
-        this.dueTime = isDate_1.isDate(dueTime) ?
-            (+dueTime - this.scheduler.now()) :
-            dueTime;
+        var absoluteDueTime = isDate_1.isDate(dueTime);
+        this.dueTime = absoluteDueTime ? (+dueTime - this.scheduler.now()) : dueTime;
     }
     TimerObservable.create = function (dueTime, period, scheduler) {
         if (dueTime === void 0) { dueTime = 0; }
@@ -37,21 +37,29 @@ var TimerObservable = (function (_super) {
         var index = state.index, period = state.period, subscriber = state.subscriber;
         var action = this;
         subscriber.next(index);
-        if (subscriber.isUnsubscribed) {
+        if (typeof period === 'undefined') {
+            subscriber.complete();
             return;
         }
-        else if (period === -1) {
-            return subscriber.complete();
+        else if (subscriber.isUnsubscribed) {
+            return;
         }
-        state.index = index + 1;
-        action.schedule(state, period);
+        if (typeof action.delay === 'undefined') {
+            action.add(action.scheduler.schedule(TimerObservable.dispatch, period, {
+                index: index + 1, period: period, subscriber: subscriber
+            }));
+        }
+        else {
+            state.index = index + 1;
+            action.schedule(state, period);
+        }
     };
     TimerObservable.prototype._subscribe = function (subscriber) {
         var index = 0;
-        var _a = this, period = _a.period, dueTime = _a.dueTime, scheduler = _a.scheduler;
-        return scheduler.schedule(TimerObservable.dispatch, dueTime, {
-            index: index, period: period, subscriber: subscriber
-        });
+        var period = this._period;
+        var dueTime = this.dueTime;
+        var scheduler = this.scheduler;
+        subscriber.add(scheduler.schedule(TimerObservable.dispatch, dueTime, { index: index, period: period, subscriber: subscriber }));
     };
     return TimerObservable;
 })(Observable_1.Observable);

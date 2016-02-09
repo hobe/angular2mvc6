@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('angular2/core');
 var router_1 = require('angular2/router');
 var people_1 = require('./people/people');
-var demo2_1 = require('./demo2/demo2');
+var grid_1 = require('./grid/grid');
 require('rxjs/add/operator/map');
 var AppComponent = (function () {
     function AppComponent(router, location) {
@@ -28,7 +28,7 @@ var AppComponent = (function () {
         }),
         router_1.RouteConfig([
             new router_1.Route({ path: '/', component: people_1.PeopleComponent, name: 'Home' }),
-            new router_1.Route({ path: '/demo2', component: demo2_1.Demo2Component, name: 'Demo2' })
+            new router_1.Route({ path: '/grid2', component: grid_1.GridComponent, name: 'Grid' })
         ]), 
         __metadata('design:paramtypes', [router_1.Router, router_1.Location])
     ], AppComponent);

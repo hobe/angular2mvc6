@@ -1,5 +1,6 @@
 var fromArray_1 = require('../observable/fromArray');
 var mergeAll_support_1 = require('./mergeAll-support');
+var queue_1 = require('../scheduler/queue');
 var isScheduler_1 = require('../util/isScheduler');
 function merge() {
     var observables = [];
@@ -7,7 +8,7 @@ function merge() {
         observables[_i - 0] = arguments[_i];
     }
     var concurrent = Number.POSITIVE_INFINITY;
-    var scheduler = null;
+    var scheduler = queue_1.queue;
     var last = observables[observables.length - 1];
     if (isScheduler_1.isScheduler(last)) {
         scheduler = observables.pop();

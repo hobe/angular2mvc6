@@ -7,15 +7,6 @@ var Subscriber_1 = require('../Subscriber');
 var noop_1 = require('../util/noop');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
-/**
- * Returns a mirrored Observable of the source Observable, but modified so that the provided Observer is called
- * for every item emitted by the source.
- * This operator is useful for debugging your observables for the correct values or performing other side effects.
- * @param {Observer|function} [nextOrObserver] a normal observer callback or callback for onNext.
- * @param {function} [error] callback for errors in the source.
- * @param {function} [complete] callback for the completion of the source.
- * @reurns {Observable} a mirrored Observable with the specified Observer or callback attached for each item.
- */
 function _do(nextOrObserver, error, complete) {
     var next;
     if (nextOrObserver && typeof nextOrObserver === 'object') {

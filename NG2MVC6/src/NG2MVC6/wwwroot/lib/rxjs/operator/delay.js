@@ -3,21 +3,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var asap_1 = require('../scheduler/asap');
-var isDate_1 = require('../util/isDate');
 var Subscriber_1 = require('../Subscriber');
 var Notification_1 = require('../Notification');
-/**
- * Returns an Observable that delays the emission of items from the source Observable
- * by a given timeout or until a given Date.
- * @param {number|Date} delay the timeout value or date until which the emission of the source items is delayed.
- * @param {Scheduler} [scheduler] the Scheduler to use for managing the timers that handle the timeout for each item.
- * @returns {Observable} an Observable that delays the emissions of the source Observable by the specified timeout or Date.
- */
+var queue_1 = require('../scheduler/queue');
+var isDate_1 = require('../util/isDate');
 function delay(delay, scheduler) {
-    if (scheduler === void 0) { scheduler = asap_1.asap; }
+    if (scheduler === void 0) { scheduler = queue_1.queue; }
     var absoluteDelay = isDate_1.isDate(delay);
-    var delayFor = absoluteDelay ? (+delay - scheduler.now()) : Math.abs(delay);
+    var delayFor = absoluteDelay ? (+delay - scheduler.now()) : delay;
     return this.lift(new DelayOperator(delayFor, scheduler));
 }
 exports.delay = delay;

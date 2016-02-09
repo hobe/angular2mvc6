@@ -3,12 +3,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Subscriber_1 = require('../Subscriber');
 var Subject_1 = require('../Subject');
 var Subscription_1 = require('../Subscription');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
-var OuterSubscriber_1 = require('../OuterSubscriber');
-var subscribeToResult_1 = require('../util/subscribeToResult');
 function windowToggle(openings, closingSelector) {
     return this.lift(new WindowToggleOperator(openings, closingSelector));
 }
@@ -27,99 +26,100 @@ var WindowToggleSubscriber = (function (_super) {
     __extends(WindowToggleSubscriber, _super);
     function WindowToggleSubscriber(destination, openings, closingSelector) {
         _super.call(this, destination);
+        this.destination = destination;
         this.openings = openings;
         this.closingSelector = closingSelector;
         this.contexts = [];
-        this.add(this.openSubscription = subscribeToResult_1.subscribeToResult(this, openings, openings));
+        this.add(this.openings._subscribe(new WindowToggleOpeningsSubscriber(this)));
     }
     WindowToggleSubscriber.prototype._next = function (value) {
         var contexts = this.contexts;
-        if (contexts) {
-            var len = contexts.length;
-            for (var i = 0; i < len; i++) {
-                contexts[i].window.next(value);
-            }
+        var len = contexts.length;
+        for (var i = 0; i < len; i++) {
+            contexts[i].window.next(value);
         }
     };
     WindowToggleSubscriber.prototype._error = function (err) {
         var contexts = this.contexts;
-        this.contexts = null;
-        if (contexts) {
-            var len = contexts.length;
-            var index = -1;
-            while (++index < len) {
-                var context = contexts[index];
-                context.window.error(err);
-                context.subscription.unsubscribe();
-            }
+        while (contexts.length > 0) {
+            contexts.shift().window.error(err);
         }
-        _super.prototype._error.call(this, err);
+        this.destination.error(err);
     };
     WindowToggleSubscriber.prototype._complete = function () {
         var contexts = this.contexts;
-        this.contexts = null;
-        if (contexts) {
-            var len = contexts.length;
-            var index = -1;
-            while (++index < len) {
-                var context = contexts[index];
-                context.window.complete();
-                context.subscription.unsubscribe();
-            }
+        while (contexts.length > 0) {
+            var context = contexts.shift();
+            context.window.complete();
+            context.subscription.unsubscribe();
         }
-        _super.prototype._complete.call(this);
+        this.destination.complete();
     };
-    WindowToggleSubscriber.prototype._unsubscribe = function () {
-        var contexts = this.contexts;
-        this.contexts = null;
-        if (contexts) {
-            var len = contexts.length;
-            var index = -1;
-            while (++index < len) {
-                var context = contexts[index];
-                context.window.unsubscribe();
-                context.subscription.unsubscribe();
-            }
-        }
-    };
-    WindowToggleSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
-        if (outerValue === this.openings) {
-            var closingSelector = this.closingSelector;
-            var closingNotifier = tryCatch_1.tryCatch(closingSelector)(innerValue);
-            if (closingNotifier === errorObject_1.errorObject) {
-                return this.error(errorObject_1.errorObject.e);
-            }
-            else {
-                var window_1 = new Subject_1.Subject();
-                var subscription = new Subscription_1.Subscription();
-                var context = { window: window_1, subscription: subscription };
-                this.contexts.push(context);
-                var innerSubscription = subscribeToResult_1.subscribeToResult(this, closingNotifier, context);
-                innerSubscription.context = context;
-                subscription.add(innerSubscription);
-                this.destination.next(window_1);
-            }
+    WindowToggleSubscriber.prototype.openWindow = function (value) {
+        var closingSelector = this.closingSelector;
+        var closingNotifier = tryCatch_1.tryCatch(closingSelector)(value);
+        if (closingNotifier === errorObject_1.errorObject) {
+            this.error(closingNotifier.e);
         }
         else {
-            this.closeWindow(this.contexts.indexOf(outerValue));
+            var destination = this.destination;
+            var window_1 = new Subject_1.Subject();
+            var subscription = new Subscription_1.Subscription();
+            var context = { window: window_1, subscription: subscription };
+            this.contexts.push(context);
+            var subscriber = new WindowClosingNotifierSubscriber(this, context);
+            var closingSubscription = closingNotifier._subscribe(subscriber);
+            subscription.add(closingSubscription);
+            destination.add(subscription);
+            destination.add(window_1);
+            destination.next(window_1);
         }
     };
-    WindowToggleSubscriber.prototype.notifyError = function (err) {
-        this.error(err);
-    };
-    WindowToggleSubscriber.prototype.notifyComplete = function (inner) {
-        if (inner !== this.openSubscription) {
-            this.closeWindow(this.contexts.indexOf(inner.context));
-        }
-    };
-    WindowToggleSubscriber.prototype.closeWindow = function (index) {
-        var contexts = this.contexts;
-        var context = contexts[index];
+    WindowToggleSubscriber.prototype.closeWindow = function (context) {
         var window = context.window, subscription = context.subscription;
-        contexts.splice(index, 1);
+        var contexts = this.contexts;
+        var destination = this.destination;
+        contexts.splice(contexts.indexOf(context), 1);
         window.complete();
+        destination.remove(subscription);
+        destination.remove(window);
         subscription.unsubscribe();
     };
     return WindowToggleSubscriber;
-})(OuterSubscriber_1.OuterSubscriber);
+})(Subscriber_1.Subscriber);
+var WindowClosingNotifierSubscriber = (function (_super) {
+    __extends(WindowClosingNotifierSubscriber, _super);
+    function WindowClosingNotifierSubscriber(parent, windowContext) {
+        _super.call(this, null);
+        this.parent = parent;
+        this.windowContext = windowContext;
+    }
+    WindowClosingNotifierSubscriber.prototype._next = function () {
+        this.parent.closeWindow(this.windowContext);
+    };
+    WindowClosingNotifierSubscriber.prototype._error = function (err) {
+        this.parent.error(err);
+    };
+    WindowClosingNotifierSubscriber.prototype._complete = function () {
+        this.parent.closeWindow(this.windowContext);
+    };
+    return WindowClosingNotifierSubscriber;
+})(Subscriber_1.Subscriber);
+var WindowToggleOpeningsSubscriber = (function (_super) {
+    __extends(WindowToggleOpeningsSubscriber, _super);
+    function WindowToggleOpeningsSubscriber(parent) {
+        _super.call(this);
+        this.parent = parent;
+    }
+    WindowToggleOpeningsSubscriber.prototype._next = function (value) {
+        this.parent.openWindow(value);
+    };
+    WindowToggleOpeningsSubscriber.prototype._error = function (err) {
+        this.parent.error(err);
+    };
+    WindowToggleOpeningsSubscriber.prototype._complete = function () {
+        // noop
+    };
+    return WindowToggleOpeningsSubscriber;
+})(Subscriber_1.Subscriber);
 //# sourceMappingURL=windowToggle.js.map

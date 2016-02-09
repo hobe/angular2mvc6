@@ -3,8 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OuterSubscriber_1 = require('../OuterSubscriber');
-var subscribeToResult_1 = require('../util/subscribeToResult');
+var Subscriber_1 = require('../Subscriber');
+var noop_1 = require('../util/noop');
 function takeUntil(notifier) {
     return this.lift(new TakeUntilOperator(notifier));
 }
@@ -23,14 +23,31 @@ var TakeUntilSubscriber = (function (_super) {
     function TakeUntilSubscriber(destination, notifier) {
         _super.call(this, destination);
         this.notifier = notifier;
-        this.add(subscribeToResult_1.subscribeToResult(this, notifier));
+        this.notificationSubscriber = null;
+        this.notificationSubscriber = new TakeUntilInnerSubscriber(destination);
+        this.add(notifier.subscribe(this.notificationSubscriber));
     }
-    TakeUntilSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
-        this.complete();
-    };
-    TakeUntilSubscriber.prototype.notifyComplete = function () {
-        // noop
+    TakeUntilSubscriber.prototype._complete = function () {
+        this.destination.complete();
+        this.notificationSubscriber.unsubscribe();
     };
     return TakeUntilSubscriber;
-})(OuterSubscriber_1.OuterSubscriber);
+})(Subscriber_1.Subscriber);
+var TakeUntilInnerSubscriber = (function (_super) {
+    __extends(TakeUntilInnerSubscriber, _super);
+    function TakeUntilInnerSubscriber(destination) {
+        _super.call(this, null);
+        this.destination = destination;
+    }
+    TakeUntilInnerSubscriber.prototype._next = function (unused) {
+        this.destination.complete();
+    };
+    TakeUntilInnerSubscriber.prototype._error = function (err) {
+        this.destination.error(err);
+    };
+    TakeUntilInnerSubscriber.prototype._complete = function () {
+        noop_1.noop();
+    };
+    return TakeUntilInnerSubscriber;
+})(Subscriber_1.Subscriber);
 //# sourceMappingURL=takeUntil.js.map

@@ -10,11 +10,8 @@ function repeat(count) {
     if (count === 0) {
         return new empty_1.EmptyObservable();
     }
-    else if (count < 0) {
-        return this.lift(new RepeatOperator(-1, this));
-    }
     else {
-        return this.lift(new RepeatOperator(count - 1, this));
+        return this.lift(new RepeatOperator(count, this));
     }
 }
 exports.repeat = repeat;
@@ -24,32 +21,72 @@ var RepeatOperator = (function () {
         this.source = source;
     }
     RepeatOperator.prototype.call = function (subscriber) {
-        return new RepeatSubscriber(subscriber, this.count, this.source);
+        return new FirstRepeatSubscriber(subscriber, this.count, this.source);
     };
     return RepeatOperator;
 })();
-var RepeatSubscriber = (function (_super) {
-    __extends(RepeatSubscriber, _super);
-    function RepeatSubscriber(destination, count, source) {
-        _super.call(this, destination);
+var FirstRepeatSubscriber = (function (_super) {
+    __extends(FirstRepeatSubscriber, _super);
+    function FirstRepeatSubscriber(destination, count, source) {
+        _super.call(this);
+        this.destination = destination;
         this.count = count;
         this.source = source;
+        destination.add(this);
+        this.lastSubscription = this;
     }
-    RepeatSubscriber.prototype.complete = function () {
-        if (!this.isStopped) {
-            var _a = this, source = _a.source, count = _a.count;
-            if (count === 0) {
-                return _super.prototype.complete.call(this);
-            }
-            else if (count > -1) {
-                this.count = count - 1;
-            }
-            this.unsubscribe();
-            this.isStopped = false;
-            this.isUnsubscribed = false;
-            source.subscribe(this);
+    FirstRepeatSubscriber.prototype._next = function (value) {
+        this.destination.next(value);
+    };
+    FirstRepeatSubscriber.prototype._error = function (err) {
+        this.destination.error(err);
+    };
+    FirstRepeatSubscriber.prototype.complete = function () {
+        if (!this.isUnsubscribed) {
+            this.resubscribe(this.count);
         }
     };
-    return RepeatSubscriber;
+    FirstRepeatSubscriber.prototype.unsubscribe = function () {
+        var lastSubscription = this.lastSubscription;
+        if (lastSubscription === this) {
+            _super.prototype.unsubscribe.call(this);
+        }
+        else {
+            lastSubscription.unsubscribe();
+        }
+    };
+    FirstRepeatSubscriber.prototype.resubscribe = function (count) {
+        var _a = this, destination = _a.destination, lastSubscription = _a.lastSubscription;
+        destination.remove(lastSubscription);
+        lastSubscription.unsubscribe();
+        if (count - 1 === 0) {
+            destination.complete();
+        }
+        else {
+            var nextSubscriber = new MoreRepeatSubscriber(this, count - 1);
+            this.lastSubscription = this.source.subscribe(nextSubscriber);
+            destination.add(this.lastSubscription);
+        }
+    };
+    return FirstRepeatSubscriber;
+})(Subscriber_1.Subscriber);
+var MoreRepeatSubscriber = (function (_super) {
+    __extends(MoreRepeatSubscriber, _super);
+    function MoreRepeatSubscriber(parent, count) {
+        _super.call(this);
+        this.parent = parent;
+        this.count = count;
+    }
+    MoreRepeatSubscriber.prototype._next = function (value) {
+        this.parent.destination.next(value);
+    };
+    MoreRepeatSubscriber.prototype._error = function (err) {
+        this.parent.destination.error(err);
+    };
+    MoreRepeatSubscriber.prototype._complete = function () {
+        var count = this.count;
+        this.parent.resubscribe(count < 0 ? -1 : count);
+    };
+    return MoreRepeatSubscriber;
 })(Subscriber_1.Subscriber);
 //# sourceMappingURL=repeat.js.map

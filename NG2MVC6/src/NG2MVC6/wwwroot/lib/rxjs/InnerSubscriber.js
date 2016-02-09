@@ -14,15 +14,14 @@ var InnerSubscriber = (function (_super) {
         this.index = 0;
     }
     InnerSubscriber.prototype._next = function (value) {
-        this.parent.notifyNext(this.outerValue, value, this.outerIndex, this.index++);
+        var index = this.index++;
+        this.parent.notifyNext(this.outerValue, value, this.outerIndex, index);
     };
     InnerSubscriber.prototype._error = function (error) {
         this.parent.notifyError(error, this);
-        this.unsubscribe();
     };
     InnerSubscriber.prototype._complete = function () {
         this.parent.notifyComplete(this);
-        this.unsubscribe();
     };
     return InnerSubscriber;
 })(Subscriber_1.Subscriber);

@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Subscription_1 = require('../Subscription');
+var Subscriber_1 = require('../Subscriber');
 var SubjectSubscription = (function (_super) {
     __extends(SubjectSubscription, _super);
     function SubjectSubscription(subject, observer) {
@@ -19,9 +20,12 @@ var SubjectSubscription = (function (_super) {
         this.isUnsubscribed = true;
         var subject = this.subject;
         var observers = subject.observers;
-        this.subject = null;
+        this.subject = void 0;
         if (!observers || observers.length === 0 || subject.isUnsubscribed) {
             return;
+        }
+        if (this.observer instanceof Subscriber_1.Subscriber) {
+            this.observer.unsubscribe();
         }
         var subscriberIndex = observers.indexOf(this.observer);
         if (subscriberIndex !== -1) {

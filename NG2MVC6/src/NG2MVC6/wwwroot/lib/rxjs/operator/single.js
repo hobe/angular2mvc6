@@ -45,7 +45,7 @@ var SingleSubscriber = (function (_super) {
         if (predicate) {
             var result = tryCatch_1.tryCatch(predicate)(value, currentIndex, this.source);
             if (result === errorObject_1.errorObject) {
-                this.destination.error(errorObject_1.errorObject.e);
+                this.destination.error(result.e);
             }
             else if (result) {
                 this.applySingleValue(value);

@@ -5,12 +5,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Subscriber_1 = require('../Subscriber');
 var Subscription_1 = require('../Subscription');
-/**
- * Returns an Observable that mirrors the source Observable, but will call a specified function when
- * the source terminates on complete or error.
- * @param {function} finallySelector function to be called when source terminates.
- * @returns {Observable} an Observable that mirrors the source, but will call the specified function on termination.
- */
 function _finally(finallySelector) {
     return this.lift(new FinallyOperator(finallySelector));
 }

@@ -3,13 +3,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var isArray_1 = require('../util/isArray');
 var Subscriber_1 = require('../Subscriber');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
 var OuterSubscriber_1 = require('../OuterSubscriber');
 var subscribeToResult_1 = require('../util/subscribeToResult');
 var SymbolShim_1 = require('../util/SymbolShim');
+var isArray = Array.isArray;
 var ZipOperator = (function () {
     function ZipOperator(project) {
         this.project = project;
@@ -34,7 +34,7 @@ var ZipSubscriber = (function (_super) {
     ZipSubscriber.prototype._next = function (value) {
         var iterators = this.iterators;
         var index = this.index++;
-        if (isArray_1.isArray(value)) {
+        if (isArray(value)) {
             iterators.push(new StaticArrayIterator(value));
         }
         else if (typeof value[SymbolShim_1.SymbolShim.iterator] === 'function') {
@@ -51,7 +51,7 @@ var ZipSubscriber = (function (_super) {
         for (var i = 0; i < len; i++) {
             var iterator = iterators[i];
             if (iterator.stillUnsubscribed) {
-                this.add(iterator.subscribe(iterator, i));
+                iterator.subscribe(iterator, i);
             }
             else {
                 this.active--; // not an observable
@@ -198,7 +198,7 @@ var ZipBufferIterator = (function (_super) {
         this.parent.checkIterators();
     };
     ZipBufferIterator.prototype.subscribe = function (value, index) {
-        return subscribeToResult_1.subscribeToResult(this, this.observable, this, index);
+        this.add(subscribeToResult_1.subscribeToResult(this, this.observable, this, index));
     };
     return ZipBufferIterator;
 })(OuterSubscriber_1.OuterSubscriber);

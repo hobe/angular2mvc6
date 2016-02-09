@@ -6,26 +6,24 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Subscriber_1 = require('../Subscriber');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
-function distinctUntilChanged(compare, keySelector) {
-    return this.lift(new DistinctUntilChangedOperator(compare, keySelector));
+function distinctUntilChanged(compare) {
+    return this.lift(new DistinctUntilChangedOperator(compare));
 }
 exports.distinctUntilChanged = distinctUntilChanged;
 var DistinctUntilChangedOperator = (function () {
-    function DistinctUntilChangedOperator(compare, keySelector) {
+    function DistinctUntilChangedOperator(compare) {
         this.compare = compare;
-        this.keySelector = keySelector;
     }
     DistinctUntilChangedOperator.prototype.call = function (subscriber) {
-        return new DistinctUntilChangedSubscriber(subscriber, this.compare, this.keySelector);
+        return new DistinctUntilChangedSubscriber(subscriber, this.compare);
     };
     return DistinctUntilChangedOperator;
 })();
 var DistinctUntilChangedSubscriber = (function (_super) {
     __extends(DistinctUntilChangedSubscriber, _super);
-    function DistinctUntilChangedSubscriber(destination, compare, keySelector) {
+    function DistinctUntilChangedSubscriber(destination, compare) {
         _super.call(this, destination);
-        this.keySelector = keySelector;
-        this.hasKey = false;
+        this.hasValue = false;
         if (typeof compare === 'function') {
             this.compare = compare;
         }
@@ -34,26 +32,19 @@ var DistinctUntilChangedSubscriber = (function (_super) {
         return x === y;
     };
     DistinctUntilChangedSubscriber.prototype._next = function (value) {
-        var keySelector = this.keySelector;
-        var key = value;
-        if (keySelector) {
-            key = tryCatch_1.tryCatch(this.keySelector)(value);
-            if (key === errorObject_1.errorObject) {
-                return this.destination.error(errorObject_1.errorObject.e);
-            }
-        }
         var result = false;
-        if (this.hasKey) {
-            result = tryCatch_1.tryCatch(this.compare)(this.key, key);
+        if (this.hasValue) {
+            result = tryCatch_1.tryCatch(this.compare)(this.value, value);
             if (result === errorObject_1.errorObject) {
-                return this.destination.error(errorObject_1.errorObject.e);
+                this.destination.error(errorObject_1.errorObject.e);
+                return;
             }
         }
         else {
-            this.hasKey = true;
+            this.hasValue = true;
         }
         if (Boolean(result) === false) {
-            this.key = key;
+            this.value = value;
             this.destination.next(value);
         }
     };

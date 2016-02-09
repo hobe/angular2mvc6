@@ -15,9 +15,10 @@ var errorObject_1 = require('../util/errorObject');
  *  catch `selector` function.
  */
 function _catch(selector) {
-    var operator = new CatchOperator(selector);
-    var caught = this.lift(operator);
-    return (operator.caught = caught);
+    var catchOperator = new CatchOperator(selector);
+    var caught = this.lift(catchOperator);
+    catchOperator.caught = caught;
+    return caught;
 }
 exports._catch = _catch;
 var CatchOperator = (function () {
@@ -32,23 +33,32 @@ var CatchOperator = (function () {
 var CatchSubscriber = (function (_super) {
     __extends(CatchSubscriber, _super);
     function CatchSubscriber(destination, selector, caught) {
-        _super.call(this, destination);
+        _super.call(this, null);
+        this.destination = destination;
         this.selector = selector;
         this.caught = caught;
+        this.lastSubscription = this;
+        this.destination.add(this);
     }
-    CatchSubscriber.prototype.error = function (err) {
-        if (!this.isStopped) {
-            var result = tryCatch_1.tryCatch(this.selector)(err, this.caught);
-            if (result === errorObject_1.errorObject) {
-                _super.prototype.error.call(this, errorObject_1.errorObject.e);
-            }
-            else {
-                var destination = this.destination;
-                this.unsubscribe();
-                destination.remove(this);
-                result.subscribe(this.destination);
-            }
+    CatchSubscriber.prototype._next = function (value) {
+        this.destination.next(value);
+    };
+    CatchSubscriber.prototype._error = function (err) {
+        var result = tryCatch_1.tryCatch(this.selector)(err, this.caught);
+        if (result === errorObject_1.errorObject) {
+            this.destination.error(errorObject_1.errorObject.e);
         }
+        else {
+            this.lastSubscription.unsubscribe();
+            this.lastSubscription = result.subscribe(this.destination);
+        }
+    };
+    CatchSubscriber.prototype._complete = function () {
+        this.lastSubscription.unsubscribe();
+        this.destination.complete();
+    };
+    CatchSubscriber.prototype._unsubscribe = function () {
+        this.lastSubscription.unsubscribe();
     };
     return CatchSubscriber;
 })(Subscriber_1.Subscriber);

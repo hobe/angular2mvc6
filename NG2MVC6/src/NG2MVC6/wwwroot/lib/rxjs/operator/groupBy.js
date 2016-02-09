@@ -48,7 +48,7 @@ var GroupBySubscriber = (function (_super) {
     GroupBySubscriber.prototype._next = function (x) {
         var key = tryCatch_1.tryCatch(this.keySelector)(x);
         if (key === errorObject_1.errorObject) {
-            this.error(errorObject_1.errorObject.e);
+            this.error(key.e);
         }
         else {
             var groups = this.groups;
@@ -64,10 +64,10 @@ var GroupBySubscriber = (function (_super) {
                 if (durationSelector) {
                     var duration = tryCatch_1.tryCatch(durationSelector)(new groupBy_support_1.GroupedObservable(key, group));
                     if (duration === errorObject_1.errorObject) {
-                        this.error(errorObject_1.errorObject.e);
+                        this.error(duration.e);
                     }
                     else {
-                        this.add(duration.subscribe(new GroupDurationSubscriber(key, group, this)));
+                        this.add(duration._subscribe(new GroupDurationSubscriber(key, group, this)));
                     }
                 }
                 this.destination.next(groupedObservable);
@@ -75,7 +75,7 @@ var GroupBySubscriber = (function (_super) {
             if (elementSelector) {
                 var value = tryCatch_1.tryCatch(elementSelector)(x);
                 if (value === errorObject_1.errorObject) {
-                    this.error(errorObject_1.errorObject.e);
+                    this.error(value.e);
                 }
                 else {
                     group.next(value);
@@ -103,7 +103,7 @@ var GroupBySubscriber = (function (_super) {
         if (groups) {
             groups.forEach(function (group, key) {
                 group.complete();
-                _this.removeGroup(key);
+                _this.removeGroup(group);
             });
         }
         this.destination.complete();
@@ -116,7 +116,7 @@ var GroupBySubscriber = (function (_super) {
 var GroupDurationSubscriber = (function (_super) {
     __extends(GroupDurationSubscriber, _super);
     function GroupDurationSubscriber(key, group, parent) {
-        _super.call(this);
+        _super.call(this, null);
         this.key = key;
         this.group = group;
         this.parent = parent;

@@ -8,17 +8,11 @@ var Subscription_1 = require('../Subscription');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
 /**
- * Buffers values from the source by opening the buffer via signals from an
- * Observable provided to `openings`, and closing and sending the buffers when
- * an Observable returned by the `closingSelector` emits.
- *
- * <img src="./img/bufferToggle.png" width="100%">
- *
- * @param {Observable<O>} openings An observable of notifications to start new
- * buffers.
- * @param {Function} closingSelector a function that takes the value emitted by
- * the `openings` observable and returns an Observable, which, when it emits,
- * signals that the associated buffer should be emitted and cleared.
+ * buffers values from the source by opening the buffer via signals from an observable provided to `openings`, and closing
+ * and sending the buffers when an observable returned by the `closingSelector` emits.
+ * @param {Observable<O>} openings An observable of notifications to start new buffers
+ * @param {Function} an function, that takes the value emitted by the `openings` observable and returns an Observable, which,
+ *  when it emits, signals that the associated buffer should be emitted and cleared.
  * @returns {Observable<T[]>} an observable of arrays of buffered values.
  */
 function bufferToggle(openings, closingSelector) {
@@ -42,7 +36,7 @@ var BufferToggleSubscriber = (function (_super) {
         this.openings = openings;
         this.closingSelector = closingSelector;
         this.contexts = [];
-        this.add(this.openings.subscribe(new BufferToggleOpeningsSubscriber(this)));
+        this.add(this.openings._subscribe(new BufferToggleOpeningsSubscriber(this)));
     }
     BufferToggleSubscriber.prototype._next = function (value) {
         var contexts = this.contexts;
@@ -60,7 +54,7 @@ var BufferToggleSubscriber = (function (_super) {
             context.subscription = null;
         }
         this.contexts = null;
-        _super.prototype._error.call(this, err);
+        this.destination.error(err);
     };
     BufferToggleSubscriber.prototype._complete = function () {
         var contexts = this.contexts;
@@ -72,14 +66,14 @@ var BufferToggleSubscriber = (function (_super) {
             context.subscription = null;
         }
         this.contexts = null;
-        _super.prototype._complete.call(this);
+        this.destination.complete();
     };
     BufferToggleSubscriber.prototype.openBuffer = function (value) {
         var closingSelector = this.closingSelector;
         var contexts = this.contexts;
         var closingNotifier = tryCatch_1.tryCatch(closingSelector)(value);
         if (closingNotifier === errorObject_1.errorObject) {
-            this._error(errorObject_1.errorObject.e);
+            this._error(closingNotifier.e);
         }
         else {
             var context = {
@@ -88,7 +82,7 @@ var BufferToggleSubscriber = (function (_super) {
             };
             contexts.push(context);
             var subscriber = new BufferToggleClosingsSubscriber(this, context);
-            var subscription = closingNotifier.subscribe(subscriber);
+            var subscription = closingNotifier._subscribe(subscriber);
             context.subscription.add(subscription);
             this.add(subscription);
         }

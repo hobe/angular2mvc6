@@ -7,12 +7,6 @@ var Subscriber_1 = require('../Subscriber');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
 var EmptyError_1 = require('../util/EmptyError');
-/**
- * Returns an Observable that emits the first item of the source Observable that matches the specified condition.
- * Throws an error if matching element is not found.
- * @param {function} predicate function called with each item to test for condition matching.
- * @returns {Observable} an Observable of the first item that matches the condition.
- */
 function first(predicate, resultSelector, defaultValue) {
     return this.lift(new FirstOperator(predicate, resultSelector, defaultValue, this));
 }

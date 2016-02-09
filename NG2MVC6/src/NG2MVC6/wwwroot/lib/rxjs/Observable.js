@@ -1,6 +1,7 @@
+var Subscriber_1 = require('./Subscriber');
 var root_1 = require('./util/root');
 var SymbolShim_1 = require('./util/SymbolShim');
-var toSubscriber_1 = require('./util/toSubscriber');
+var rxSubscriber_1 = require('./symbol/rxSubscriber');
 /**
  * A representation of any set of values over any amount of time. This the most basic building block
  * of RxJS.
@@ -35,6 +36,14 @@ var Observable = (function () {
         return observable;
     };
     /**
+     * @method Symbol.observable
+     * @returns {Observable} this instance of the observable
+     * @description an interop point defined by the es7-observable spec https://github.com/zenparsing/es-observable
+     */
+    Observable.prototype[SymbolShim_1.SymbolShim.observable] = function () {
+        return this;
+    };
+    /**
      * @method subscribe
      * @param {Observer|Function} observerOrNext (optional) either an observer defining all functions to be called,
      *  or the first of three possible handlers, which is the handler for each value emitted from the observable.
@@ -46,14 +55,23 @@ var Observable = (function () {
      *  executes the observable's subscriber function, which will take action to set up the underlying data stream
      */
     Observable.prototype.subscribe = function (observerOrNext, error, complete) {
-        var operator = this.operator;
-        var subscriber = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
-        if (operator) {
-            subscriber.add(this._subscribe(this.operator.call(subscriber)));
+        var subscriber;
+        if (observerOrNext && typeof observerOrNext === 'object') {
+            if (observerOrNext instanceof Subscriber_1.Subscriber) {
+                subscriber = observerOrNext;
+            }
+            else if (observerOrNext[rxSubscriber_1.rxSubscriber]) {
+                subscriber = observerOrNext[rxSubscriber_1.rxSubscriber]();
+            }
+            else {
+                subscriber = new Subscriber_1.Subscriber(observerOrNext);
+            }
         }
         else {
-            subscriber.add(this._subscribe(subscriber));
+            var next = observerOrNext;
+            subscriber = Subscriber_1.Subscriber.create(next, error, complete);
         }
+        subscriber.add(this._subscribe(subscriber));
         return subscriber;
     };
     /**
@@ -97,15 +115,7 @@ var Observable = (function () {
         return new PromiseCtor(promiseCallback);
     };
     Observable.prototype._subscribe = function (subscriber) {
-        return this.source.subscribe(subscriber);
-    };
-    /**
-     * @method Symbol.observable
-     * @returns {Observable} this instance of the observable
-     * @description an interop point defined by the es7-observable spec https://github.com/zenparsing/es-observable
-     */
-    Observable.prototype[SymbolShim_1.SymbolShim.observable] = function () {
-        return this;
+        return this.source._subscribe(this.operator.call(subscriber));
     };
     // HACK: Since TypeScript inherits static properties too, we have to
     // fight against TypeScript here so Subject can have a different static create signature

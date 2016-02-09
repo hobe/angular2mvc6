@@ -3,14 +3,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var asap_1 = require('../scheduler/asap');
-var isDate_1 = require('../util/isDate');
 var Subscriber_1 = require('../Subscriber');
+var queue_1 = require('../scheduler/queue');
+var isDate_1 = require('../util/isDate');
 function timeout(due, errorToSend, scheduler) {
     if (errorToSend === void 0) { errorToSend = null; }
-    if (scheduler === void 0) { scheduler = asap_1.asap; }
+    if (scheduler === void 0) { scheduler = queue_1.queue; }
     var absoluteTimeout = isDate_1.isDate(due);
-    var waitFor = absoluteTimeout ? (+due - scheduler.now()) : Math.abs(due);
+    var waitFor = absoluteTimeout ? (+due - scheduler.now()) : due;
     return this.lift(new TimeoutOperator(waitFor, absoluteTimeout, errorToSend, scheduler));
 }
 exports.timeout = timeout;

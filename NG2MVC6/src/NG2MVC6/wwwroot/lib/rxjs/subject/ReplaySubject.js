@@ -5,17 +5,16 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Subject_1 = require('../Subject');
 var queue_1 = require('../scheduler/queue');
-var observeOn_support_1 = require('../operator/observeOn-support');
 var ReplaySubject = (function (_super) {
     __extends(ReplaySubject, _super);
-    function ReplaySubject(bufferSize, windowSize, scheduler) {
+    function ReplaySubject(bufferSize, windowTime, scheduler) {
         if (bufferSize === void 0) { bufferSize = Number.POSITIVE_INFINITY; }
-        if (windowSize === void 0) { windowSize = Number.POSITIVE_INFINITY; }
+        if (windowTime === void 0) { windowTime = Number.POSITIVE_INFINITY; }
         _super.call(this);
         this.events = [];
-        this.scheduler = scheduler;
         this.bufferSize = bufferSize < 1 ? 1 : bufferSize;
-        this.windowSize = windowSize < 1 ? 1 : windowSize;
+        this._windowTime = windowTime < 1 ? 1 : windowTime;
+        this.scheduler = scheduler;
     }
     ReplaySubject.prototype._next = function (value) {
         var now = this._getNow();
@@ -25,13 +24,9 @@ var ReplaySubject = (function (_super) {
     };
     ReplaySubject.prototype._subscribe = function (subscriber) {
         var events = this._trimBufferThenGetEvents(this._getNow());
-        var scheduler = this.scheduler;
-        if (scheduler) {
-            subscriber.add(subscriber = new observeOn_support_1.ObserveOnSubscriber(subscriber, scheduler));
-        }
         var index = -1;
         var len = events.length;
-        while (++index < len && !subscriber.isUnsubscribed) {
+        while (!subscriber.isUnsubscribed && ++index < len) {
             subscriber.next(events[index].value);
         }
         return _super.prototype._subscribe.call(this, subscriber);
@@ -41,7 +36,7 @@ var ReplaySubject = (function (_super) {
     };
     ReplaySubject.prototype._trimBufferThenGetEvents = function (now) {
         var bufferSize = this.bufferSize;
-        var windowSize = this.windowSize;
+        var _windowTime = this._windowTime;
         var events = this.events;
         var eventsCount = events.length;
         var spliceCount = 0;
@@ -49,7 +44,7 @@ var ReplaySubject = (function (_super) {
         // Start at the front of the list. Break early once
         // we encounter an event that falls within the window.
         while (spliceCount < eventsCount) {
-            if ((now - events[spliceCount].time) < windowSize) {
+            if ((now - events[spliceCount].time) < _windowTime) {
                 break;
             }
             spliceCount += 1;

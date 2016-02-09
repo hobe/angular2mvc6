@@ -1,9 +1,7 @@
-var root_1 = require('./root');
-var isArray_1 = require('./isArray');
-var isPromise_1 = require('./isPromise');
 var Observable_1 = require('../Observable');
 var SymbolShim_1 = require('../util/SymbolShim');
 var InnerSubscriber_1 = require('../InnerSubscriber');
+var isArray = Array.isArray;
 function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
     var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
     if (destination.isUnsubscribed) {
@@ -19,7 +17,7 @@ function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
             return result.subscribe(destination);
         }
     }
-    if (isArray_1.isArray(result)) {
+    if (isArray(result)) {
         for (var i = 0, len = result.length; i < len && !destination.isUnsubscribed; i++) {
             destination.next(result[i]);
         }
@@ -27,16 +25,16 @@ function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
             destination.complete();
         }
     }
-    else if (isPromise_1.isPromise(result)) {
-        result.then(function (value) {
+    else if (typeof result.then === 'function') {
+        result.then(function (x) {
             if (!destination.isUnsubscribed) {
-                destination.next(value);
+                destination.next(x);
                 destination.complete();
             }
         }, function (err) { return destination.error(err); })
             .then(null, function (err) {
             // Escaping the Promise trap: globally throw unhandled errors
-            root_1.root.setTimeout(function () { throw err; });
+            setTimeout(function () { throw err; });
         });
         return destination;
     }

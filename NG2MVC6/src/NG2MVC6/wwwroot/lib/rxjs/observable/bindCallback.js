@@ -66,14 +66,14 @@ var BoundCallbackObservable = (function (_super) {
             return subject.subscribe(subscriber);
         }
         else {
-            return scheduler.schedule(dispatch, 0, { source: this, subscriber: subscriber });
+            subscriber.add(scheduler.schedule(dispatch, 0, { source: this, subscriber: subscriber }));
+            return subscriber;
         }
     };
     return BoundCallbackObservable;
 })(Observable_1.Observable);
 exports.BoundCallbackObservable = BoundCallbackObservable;
 function dispatch(state) {
-    var self = this;
     var source = state.source, subscriber = state.subscriber;
     var callbackFunc = source.callbackFunc, args = source.args, scheduler = source.scheduler;
     var subject = source.subject;
@@ -89,15 +89,15 @@ function dispatch(state) {
             if (selector) {
                 var result_2 = tryCatch_1.tryCatch(selector).apply(this, innerArgs);
                 if (result_2 === errorObject_1.errorObject) {
-                    self.add(scheduler.schedule(dispatchError, 0, { err: errorObject_1.errorObject.e, subject: subject }));
+                    subject.add(scheduler.schedule(dispatchError, 0, { err: errorObject_1.errorObject.e, subject: subject }));
                 }
                 else {
-                    self.add(scheduler.schedule(dispatchNext, 0, { value: result_2, subject: subject }));
+                    subject.add(scheduler.schedule(dispatchNext, 0, { value: result_2, subject: subject }));
                 }
             }
             else {
                 var value = innerArgs.length === 1 ? innerArgs[0] : innerArgs;
-                self.add(scheduler.schedule(dispatchNext, 0, { value: value, subject: subject }));
+                subject.add(scheduler.schedule(dispatchNext, 0, { value: value, subject: subject }));
             }
         };
         // use named function to pass values in without closure
@@ -107,7 +107,7 @@ function dispatch(state) {
             subject.error(errorObject_1.errorObject.e);
         }
     }
-    self.add(subject.subscribe(subscriber));
+    this.add(subject.subscribe(subscriber));
 }
 function dispatchNext(_a) {
     var value = _a.value, subject = _a.subject;

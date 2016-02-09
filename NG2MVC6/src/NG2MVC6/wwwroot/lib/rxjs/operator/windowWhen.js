@@ -66,13 +66,13 @@ var WindowSubscriber = (function (_super) {
         this.destination.next(window);
         var closingNotifier = tryCatch_1.tryCatch(this.closingSelector)();
         if (closingNotifier === errorObject_1.errorObject) {
-            var err = errorObject_1.errorObject.e;
+            var err = closingNotifier.e;
             this.destination.error(err);
             this.window.error(err);
         }
         else {
             var closingNotification = this.closingNotification = new Subscription_1.Subscription();
-            closingNotification.add(closingNotifier.subscribe(new WindowClosingNotifierSubscriber(this)));
+            closingNotification.add(closingNotifier._subscribe(new WindowClosingNotifierSubscriber(this)));
             this.add(closingNotification);
             this.add(window);
         }
@@ -82,7 +82,7 @@ var WindowSubscriber = (function (_super) {
 var WindowClosingNotifierSubscriber = (function (_super) {
     __extends(WindowClosingNotifierSubscriber, _super);
     function WindowClosingNotifierSubscriber(parent) {
-        _super.call(this);
+        _super.call(this, null);
         this.parent = parent;
     }
     WindowClosingNotifierSubscriber.prototype._next = function () {

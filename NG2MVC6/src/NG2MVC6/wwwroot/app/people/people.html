@@ -3,8 +3,7 @@
 <button class="ms-Button" (click)="selectAll()"><span class="ms-Button-icon"><i class="ms-Icon ms-Icon--plus"></i></span> <span class="ms-Button-label">select all</span> <span class="ms-Button-description">Mark all items as selected</span></button>
 <button class="ms-Button  ms-Button--primary" (click)="removeItems()"><span class="ms-Button-icon"><i class="ms-Icon ms-Icon--plus"></i></span> <span class="ms-Button-label">delete selected</span> <span class="ms-Button-description">Delete selected items from list</span></button>
 
-
-<label [hidden]="!isLoading">Loading...</label>
+<div class="ms-Spinner"></div>
 
 <label class="ms-Label">{{people?.length}} items found</label><!-- Elivs operator, because people is undefined before initial data load -->
 
@@ -14,7 +13,10 @@
     <div class="col-md-3">
         <p class="ms-font-xxl">Master</p>
 
-        <div class="ms-ListItem is-selectable" *ngFor="#person of people" (click)="showDetails(person)" [class.is-selected]="person.IsSelected">
+        <div class="ms-ListItem is-selectable" 
+             *ngFor="#person of people" 
+             (click)="showDetails(person)" 
+             [class.is-selected]="person.IsSelected">
             <span class="ms-ListItem-primaryText">{{person.LastName}}</span> <span class="ms-ListItem-secondaryText">{{person.FirstName}}</span> <span class="ms-ListItem-tertiaryText">{{person.DateOfBirth | date:'yyyy-MM-dd HH:mm'}}</span> 
             <div class="ms-ListItem-selectionTarget js-toggleSelection" (click)="person.IsSelected=!person.IsSelected"></div>
         </div>
@@ -24,9 +26,13 @@
     <!-- DETAIL -->
     <div id="details" class="col-md-9">
         <p class="ms-font-xxl">Detail</p>
-        <input type="text" [(ngModel)]="selectedPerson.LastName" />
 
-        <input type="text" [(ngModel)]="selectedPerson.LastName" />
+        <div class="ms-TextField">
+            <label class="ms-Label">First Name</label> <input class="ms-TextField-field" type="text" [(ngModel)]="selectedPerson.FirstName"> <span class="ms-TextField-description">This should be your first name.</span>
+        </div>
+        <div class="ms-TextField">
+            <label class="ms-Label">Last Name</label> <input class="ms-TextField-field" type="text" [(ngModel)]="selectedPerson.LastName"> <span class="ms-TextField-description">This should be your last name.</span>
+        </div>
 
         <!--<input type="date" [(ngModel)]="selectedPerson.DateOfBirth" />-->
     </div>

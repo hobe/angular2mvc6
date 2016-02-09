@@ -22,9 +22,9 @@ var ErrorObservable = (function (_super) {
         var error = this.error;
         var scheduler = this.scheduler;
         if (scheduler) {
-            return scheduler.schedule(ErrorObservable.dispatch, 0, {
+            subscriber.add(scheduler.schedule(ErrorObservable.dispatch, 0, {
                 error: error, subscriber: subscriber
-            });
+            }));
         }
         else {
             subscriber.error(error);

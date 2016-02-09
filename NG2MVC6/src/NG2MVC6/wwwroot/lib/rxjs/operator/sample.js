@@ -3,8 +3,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var OuterSubscriber_1 = require('../OuterSubscriber');
-var subscribeToResult_1 = require('../util/subscribeToResult');
+var Subscriber_1 = require('../Subscriber');
 function sample(notifier) {
     return this.lift(new SampleOperator(notifier));
 }
@@ -22,25 +21,37 @@ var SampleSubscriber = (function (_super) {
     __extends(SampleSubscriber, _super);
     function SampleSubscriber(destination, notifier) {
         _super.call(this, destination);
+        this.notifier = notifier;
         this.hasValue = false;
-        this.add(subscribeToResult_1.subscribeToResult(this, notifier));
+        this.add(notifier._subscribe(new SampleNotificationSubscriber(this)));
     }
     SampleSubscriber.prototype._next = function (value) {
-        this.value = value;
+        this.lastValue = value;
         this.hasValue = true;
     };
-    SampleSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
-        this.emitValue();
-    };
-    SampleSubscriber.prototype.notifyComplete = function () {
-        this.emitValue();
-    };
-    SampleSubscriber.prototype.emitValue = function () {
+    SampleSubscriber.prototype.notifyNext = function () {
         if (this.hasValue) {
             this.hasValue = false;
-            this.destination.next(this.value);
+            this.destination.next(this.lastValue);
         }
     };
     return SampleSubscriber;
-})(OuterSubscriber_1.OuterSubscriber);
+})(Subscriber_1.Subscriber);
+var SampleNotificationSubscriber = (function (_super) {
+    __extends(SampleNotificationSubscriber, _super);
+    function SampleNotificationSubscriber(parent) {
+        _super.call(this, null);
+        this.parent = parent;
+    }
+    SampleNotificationSubscriber.prototype._next = function () {
+        this.parent.notifyNext();
+    };
+    SampleNotificationSubscriber.prototype._error = function (err) {
+        this.parent.error(err);
+    };
+    SampleNotificationSubscriber.prototype._complete = function () {
+        this.parent.notifyNext();
+    };
+    return SampleNotificationSubscriber;
+})(Subscriber_1.Subscriber);
 //# sourceMappingURL=sample.js.map

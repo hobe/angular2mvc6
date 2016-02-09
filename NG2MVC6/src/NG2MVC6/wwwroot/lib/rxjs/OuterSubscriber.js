@@ -9,14 +9,14 @@ var OuterSubscriber = (function (_super) {
     function OuterSubscriber() {
         _super.apply(this, arguments);
     }
+    OuterSubscriber.prototype.notifyComplete = function (inner) {
+        this.destination.complete();
+    };
     OuterSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
         this.destination.next(innerValue);
     };
-    OuterSubscriber.prototype.notifyError = function (error, innerSub) {
+    OuterSubscriber.prototype.notifyError = function (error, inner) {
         this.destination.error(error);
-    };
-    OuterSubscriber.prototype.notifyComplete = function (innerSub) {
-        this.destination.complete();
     };
     return OuterSubscriber;
 })(Subscriber_1.Subscriber);

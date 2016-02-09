@@ -6,18 +6,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Subscriber_1 = require('../Subscriber');
 var asap_1 = require('../scheduler/asap');
 /**
- * Buffers values from the source for a specific time period. Optionally allows
- * new buffers to be set up at an interval.
- *
- * <img src="./img/bufferTime.png" width="100%">
- *
- * @param {number} bufferTimeSpan the amount of time to fill each buffer for
- * before emitting them and clearing them.
- * @param {number} [bufferCreationInterval] the interval at which to start new
- * buffers.
- * @param {Scheduler} [scheduler] (optional, defaults to `asap` scheduler) The
- * scheduler on which to schedule the intervals that determine buffer
- * boundaries.
+ * buffers values from the source for a specific time period. Optionally allows new buffers to be set up at an interval.
+ * @param {number} the amount of time to fill each buffer for before emitting them and clearing them.
+ * @param {number} [bufferCreationInterval] the interval at which to start new buffers.
+ * @param {Scheduler} [scheduler] (optional, defaults to `asap` scheduler) The scheduler on which to schedule the
+ *  intervals that determine buffer boundaries.
  * @returns {Observable<T[]>} an observable of arrays of buffered values.
  */
 function bufferTime(bufferTimeSpan, bufferCreationInterval, scheduler) {
@@ -66,17 +59,14 @@ var BufferTimeSubscriber = (function (_super) {
     };
     BufferTimeSubscriber.prototype._error = function (err) {
         this.buffers.length = 0;
-        _super.prototype._error.call(this, err);
+        this.destination.error(err);
     };
     BufferTimeSubscriber.prototype._complete = function () {
-        var _a = this, buffers = _a.buffers, destination = _a.destination;
+        var buffers = this.buffers;
         while (buffers.length > 0) {
-            destination.next(buffers.shift());
+            this.destination.next(buffers.shift());
         }
-        _super.prototype._complete.call(this);
-    };
-    BufferTimeSubscriber.prototype._unsubscribe = function () {
-        this.buffers = null;
+        this.destination.complete();
     };
     BufferTimeSubscriber.prototype.openBuffer = function () {
         var buffer = [];

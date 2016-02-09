@@ -6,14 +6,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Subscriber_1 = require('../Subscriber');
 var tryCatch_1 = require('../util/tryCatch');
 var errorObject_1 = require('../util/errorObject');
-/**
- * Returns an Observable that applies a specified accumulator function to each item emitted by the source Observable.
- * If a seed value is specified, then that value will be used as the initial value for the accumulator.
- * If no seed value is specified, the first item of the source is used as the seed.
- * @param {function} accumulator The accumulator function called on each item.
- * @param {any} [seed] The initial accumulator value.
- * @returns {Obervable} An observable of the accumulated values.
- */
 function scan(accumulator, seed) {
     return this.lift(new ScanOperator(accumulator, seed));
 }

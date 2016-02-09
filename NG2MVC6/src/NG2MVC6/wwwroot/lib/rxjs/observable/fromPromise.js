@@ -3,73 +3,62 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var root_1 = require('../util/root');
 var Observable_1 = require('../Observable');
+var Subscription_1 = require('../Subscription');
+var queue_1 = require('../scheduler/queue');
 var PromiseObservable = (function (_super) {
     __extends(PromiseObservable, _super);
     function PromiseObservable(promise, scheduler) {
-        if (scheduler === void 0) { scheduler = null; }
+        if (scheduler === void 0) { scheduler = queue_1.queue; }
         _super.call(this);
         this.promise = promise;
         this.scheduler = scheduler;
+        this._isScalar = false;
     }
     PromiseObservable.create = function (promise, scheduler) {
-        if (scheduler === void 0) { scheduler = null; }
+        if (scheduler === void 0) { scheduler = queue_1.queue; }
         return new PromiseObservable(promise, scheduler);
     };
     PromiseObservable.prototype._subscribe = function (subscriber) {
         var _this = this;
-        var promise = this.promise;
         var scheduler = this.scheduler;
-        if (scheduler == null) {
+        var promise = this.promise;
+        if (scheduler === queue_1.queue) {
             if (this._isScalar) {
-                if (!subscriber.isUnsubscribed) {
-                    subscriber.next(this.value);
-                    subscriber.complete();
-                }
+                subscriber.next(this.value);
+                subscriber.complete();
             }
             else {
                 promise.then(function (value) {
-                    _this.value = value;
                     _this._isScalar = true;
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.next(value);
-                        subscriber.complete();
-                    }
-                }, function (err) {
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.error(err);
-                    }
-                })
+                    _this.value = value;
+                    subscriber.next(value);
+                    subscriber.complete();
+                }, function (err) { return subscriber.error(err); })
                     .then(null, function (err) {
                     // escape the promise trap, throw unhandled errors
-                    root_1.root.setTimeout(function () { throw err; });
+                    setTimeout(function () { throw err; });
                 });
             }
         }
         else {
+            var subscription = new Subscription_1.Subscription();
             if (this._isScalar) {
-                if (!subscriber.isUnsubscribed) {
-                    return scheduler.schedule(dispatchNext, 0, { value: this.value, subscriber: subscriber });
-                }
+                var value = this.value;
+                subscription.add(scheduler.schedule(dispatchNext, 0, { value: value, subscriber: subscriber }));
             }
             else {
                 promise.then(function (value) {
-                    _this.value = value;
                     _this._isScalar = true;
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.add(scheduler.schedule(dispatchNext, 0, { value: value, subscriber: subscriber }));
-                    }
-                }, function (err) {
-                    if (!subscriber.isUnsubscribed) {
-                        subscriber.add(scheduler.schedule(dispatchError, 0, { err: err, subscriber: subscriber }));
-                    }
-                })
+                    _this.value = value;
+                    subscription.add(scheduler.schedule(dispatchNext, 0, { value: value, subscriber: subscriber }));
+                }, function (err) { return subscription.add(scheduler.schedule(dispatchError, 0, { err: err, subscriber: subscriber })); })
                     .then(null, function (err) {
                     // escape the promise trap, throw unhandled errors
-                    root_1.root.setTimeout(function () { throw err; });
+                    scheduler.schedule(function () { throw err; });
                 });
             }
+            return subscription;
         }
     };
     return PromiseObservable;
@@ -77,15 +66,11 @@ var PromiseObservable = (function (_super) {
 exports.PromiseObservable = PromiseObservable;
 function dispatchNext(_a) {
     var value = _a.value, subscriber = _a.subscriber;
-    if (!subscriber.isUnsubscribed) {
-        subscriber.next(value);
-        subscriber.complete();
-    }
+    subscriber.next(value);
+    subscriber.complete();
 }
 function dispatchError(_a) {
     var err = _a.err, subscriber = _a.subscriber;
-    if (!subscriber.isUnsubscribed) {
-        subscriber.error(err);
-    }
+    subscriber.error(err);
 }
 //# sourceMappingURL=fromPromise.js.map

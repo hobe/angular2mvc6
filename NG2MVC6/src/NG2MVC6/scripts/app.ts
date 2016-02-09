@@ -2,7 +2,7 @@
 import {ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
 import {ROUTER_DIRECTIVES, RouteConfig, Router, Location, Route} from 'angular2/router';
 import { PeopleComponent } from './people/people';
-import { Demo2Component } from './demo2/demo2';
+import { GridComponent } from './grid/grid';
 import 'rxjs/add/operator/map';
 
 @Component({
@@ -12,7 +12,7 @@ import 'rxjs/add/operator/map';
 })
 @RouteConfig([
         new Route({ path: '/', component: PeopleComponent, name: 'Home' }),
-        new Route({ path: '/demo2', component: Demo2Component, name: 'Demo2' })
+        new Route({ path: '/grid2', component: GridComponent, name: 'Grid' })
 ])
 export class AppComponent {
 

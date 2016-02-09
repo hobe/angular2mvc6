@@ -39,7 +39,7 @@ var MergeMapSubscriber = (function (_super) {
             var ish = tryCatch_1.tryCatch(this.project)(value, index);
             var destination = this.destination;
             if (ish === errorObject_1.errorObject) {
-                destination.error(errorObject_1.errorObject.e);
+                destination.error(ish.e);
             }
             else {
                 this.active++;

@@ -7,31 +7,32 @@ var Subject_1 = require('../Subject');
 var AsyncSubject = (function (_super) {
     __extends(AsyncSubject, _super);
     function AsyncSubject() {
-        _super.apply(this, arguments);
-        this.value = null;
-        this.hasNext = false;
+        _super.call(this);
+        this._value = void 0;
+        this._hasNext = false;
+        this._isScalar = false;
     }
     AsyncSubject.prototype._subscribe = function (subscriber) {
-        if (this.hasCompleted && this.hasNext) {
-            subscriber.next(this.value);
+        if (this.completeSignal && this._hasNext) {
+            subscriber.next(this._value);
         }
         return _super.prototype._subscribe.call(this, subscriber);
     };
     AsyncSubject.prototype._next = function (value) {
-        this.value = value;
-        this.hasNext = true;
+        this._value = value;
+        this._hasNext = true;
     };
     AsyncSubject.prototype._complete = function () {
         var index = -1;
         var observers = this.observers;
         var len = observers.length;
-        // optimization to block our SubjectSubscriptions from
-        // splicing themselves out of the observers list one by one.
+        // optimization -- block next, complete, and unsubscribe while dispatching
+        this.observers = void 0; // optimization
         this.isUnsubscribed = true;
-        if (this.hasNext) {
+        if (this._hasNext) {
             while (++index < len) {
                 var o = observers[index];
-                o.next(this.value);
+                o.next(this._value);
                 o.complete();
             }
         }
@@ -41,7 +42,6 @@ var AsyncSubject = (function (_super) {
             }
         }
         this.isUnsubscribed = false;
-        this.unsubscribe();
     };
     return AsyncSubject;
 })(Subject_1.Subject);

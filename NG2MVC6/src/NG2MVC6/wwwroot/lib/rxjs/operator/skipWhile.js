@@ -33,7 +33,7 @@ var SkipWhileSubscriber = (function (_super) {
             var index = this.index++;
             var result = tryCatch_1.tryCatch(this.predicate)(value, index);
             if (result === errorObject_1.errorObject) {
-                destination.error(errorObject_1.errorObject.e);
+                destination.error(result.e);
             }
             else {
                 this.skipping = Boolean(result);

@@ -27,6 +27,7 @@ var SwitchMapSubscriber = (function (_super) {
         _super.call(this, destination);
         this.project = project;
         this.resultSelector = resultSelector;
+        this.hasCompleted = false;
         this.index = 0;
     }
     SwitchMapSubscriber.prototype._next = function (value) {
@@ -34,7 +35,7 @@ var SwitchMapSubscriber = (function (_super) {
         var destination = this.destination;
         var result = tryCatch_1.tryCatch(this.project)(value, index);
         if (result === errorObject_1.errorObject) {
-            destination.error(errorObject_1.errorObject.e);
+            destination.error(result.e);
         }
         else {
             var innerSubscription = this.innerSubscription;
@@ -46,19 +47,24 @@ var SwitchMapSubscriber = (function (_super) {
     };
     SwitchMapSubscriber.prototype._complete = function () {
         var innerSubscription = this.innerSubscription;
+        this.hasCompleted = true;
         if (!innerSubscription || innerSubscription.isUnsubscribed) {
-            _super.prototype._complete.call(this);
+            this.destination.complete();
         }
-    };
-    SwitchMapSubscriber.prototype._unsubscribe = function () {
-        this.innerSubscription = null;
     };
     SwitchMapSubscriber.prototype.notifyComplete = function (innerSub) {
         this.remove(innerSub);
-        this.innerSubscription = null;
-        if (this.isStopped) {
-            _super.prototype._complete.call(this);
+        var prevSubscription = this.innerSubscription;
+        if (prevSubscription) {
+            prevSubscription.unsubscribe();
         }
+        this.innerSubscription = null;
+        if (this.hasCompleted) {
+            this.destination.complete();
+        }
+    };
+    SwitchMapSubscriber.prototype.notifyError = function (err) {
+        this.destination.error(err);
     };
     SwitchMapSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
         var _a = this, resultSelector = _a.resultSelector, destination = _a.destination;

@@ -8,18 +8,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('angular2/core');
-var Demo2Component = (function () {
-    function Demo2Component() {
+var GridComponent = (function () {
+    function GridComponent() {
     }
-    Demo2Component = __decorate([
+    GridComponent = __decorate([
         core_1.Component({
-            selector: "demo2"
+            selector: "grid"
         }),
         core_1.View({
-            templateUrl: 'app/demo2/demo2.html'
+            templateUrl: 'app/grid/grid.html'
         }), 
         __metadata('design:paramtypes', [])
-    ], Demo2Component);
-    return Demo2Component;
+    ], GridComponent);
+    return GridComponent;
 })();
-exports.Demo2Component = Demo2Component;
+exports.GridComponent = GridComponent;

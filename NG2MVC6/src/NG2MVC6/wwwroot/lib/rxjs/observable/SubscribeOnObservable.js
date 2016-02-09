@@ -35,9 +35,9 @@ var SubscribeOnObservable = (function (_super) {
         var delay = this.delayTime;
         var source = this.source;
         var scheduler = this.scheduler;
-        return scheduler.schedule(SubscribeOnObservable.dispatch, delay, {
+        subscriber.add(scheduler.schedule(SubscribeOnObservable.dispatch, delay, {
             source: source, subscriber: subscriber
-        });
+        }));
     };
     return SubscribeOnObservable;
 })(Observable_1.Observable);

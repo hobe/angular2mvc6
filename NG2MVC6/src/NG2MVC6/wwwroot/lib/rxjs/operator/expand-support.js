@@ -48,7 +48,7 @@ var ExpandSubscriber = (function (_super) {
             destination.next(value);
             var result = tryCatch_1.tryCatch(this.project)(value, index);
             if (result === errorObject_1.errorObject) {
-                destination.error(errorObject_1.errorObject.e);
+                destination.error(result.e);
             }
             else if (!this.scheduler) {
                 this.subscribeToProjection(result, value, index);
@@ -77,9 +77,6 @@ var ExpandSubscriber = (function (_super) {
             this.destination.complete();
         }
     };
-    ExpandSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
-        this._next(innerValue);
-    };
     ExpandSubscriber.prototype.notifyComplete = function (innerSub) {
         var buffer = this.buffer;
         this.remove(innerSub);
@@ -90,6 +87,9 @@ var ExpandSubscriber = (function (_super) {
         if (this.hasCompleted && this.active === 0) {
             this.destination.complete();
         }
+    };
+    ExpandSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
+        this._next(innerValue);
     };
     return ExpandSubscriber;
 })(OuterSubscriber_1.OuterSubscriber);

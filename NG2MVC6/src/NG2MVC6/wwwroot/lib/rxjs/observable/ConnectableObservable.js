@@ -4,8 +4,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Observable_1 = require('../Observable');
-var Subscriber_1 = require('../Subscriber');
 var Subscription_1 = require('../Subscription');
+var Subscriber_1 = require('../Subscriber');
 var ConnectableObservable = (function (_super) {
     __extends(ConnectableObservable, _super);
     function ConnectableObservable(source, subjectFactory) {
@@ -47,9 +47,9 @@ var ConnectableSubscription = (function (_super) {
     }
     ConnectableSubscription.prototype._unsubscribe = function () {
         var connectable = this.connectable;
-        connectable.subject = null;
-        connectable.subscription = null;
-        this.connectable = null;
+        connectable.subject = void 0;
+        connectable.subscription = void 0;
+        this.connectable = void 0;
     };
     return ConnectableSubscription;
 })(Subscription_1.Subscription);
@@ -99,7 +99,7 @@ var RefCountSubscriber = (function (_super) {
         if (subConnection && subConnection === obsConnection) {
             observable.refCount = 0;
             obsConnection.unsubscribe();
-            observable.connection = null;
+            observable.connection = void 0;
             this.unsubscribe();
         }
     };
@@ -113,7 +113,7 @@ var RefCountSubscriber = (function (_super) {
             var subConnection = this.connection;
             if (subConnection && subConnection === obsConnection) {
                 obsConnection.unsubscribe();
-                observable.connection = null;
+                observable.connection = void 0;
             }
         }
     };

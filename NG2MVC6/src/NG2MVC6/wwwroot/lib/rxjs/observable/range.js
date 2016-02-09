@@ -37,9 +37,9 @@ var RangeObservable = (function (_super) {
         var end = this.end;
         var scheduler = this.scheduler;
         if (scheduler) {
-            return scheduler.schedule(RangeObservable.dispatch, 0, {
+            subscriber.add(scheduler.schedule(RangeObservable.dispatch, 0, {
                 index: index, end: end, start: start, subscriber: subscriber
-            });
+            }));
         }
         else {
             do {

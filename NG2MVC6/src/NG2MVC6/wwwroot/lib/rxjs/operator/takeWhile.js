@@ -30,7 +30,7 @@ var TakeWhileSubscriber = (function (_super) {
         var destination = this.destination;
         var result = tryCatch_1.tryCatch(this.predicate)(value, this.index++);
         if (result == errorObject_1.errorObject) {
-            destination.error(errorObject_1.errorObject.e);
+            destination.error(result.e);
         }
         else if (Boolean(result)) {
             destination.next(value);

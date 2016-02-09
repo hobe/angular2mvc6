@@ -33,7 +33,6 @@ var FilterSubscriber = (function (_super) {
     __extends(FilterSubscriber, _super);
     function FilterSubscriber(destination, select, thisArg) {
         _super.call(this, destination);
-        this.select = select;
         this.thisArg = thisArg;
         this.count = 0;
         this.select = select;

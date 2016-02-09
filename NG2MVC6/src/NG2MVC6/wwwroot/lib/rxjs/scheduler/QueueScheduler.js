@@ -2,15 +2,15 @@ var QueueAction_1 = require('./QueueAction');
 var FutureAction_1 = require('./FutureAction');
 var QueueScheduler = (function () {
     function QueueScheduler() {
-        this.active = false;
         this.actions = [];
-        this.scheduledId = null;
+        this.active = false;
+        this.scheduled = false;
     }
     QueueScheduler.prototype.now = function () {
         return Date.now();
     };
     QueueScheduler.prototype.flush = function () {
-        if (this.active || this.scheduledId) {
+        if (this.active || this.scheduled) {
             return;
         }
         this.active = true;

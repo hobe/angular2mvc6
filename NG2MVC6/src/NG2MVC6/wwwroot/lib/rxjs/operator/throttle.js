@@ -3,10 +3,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var fromPromise_1 = require('../observable/fromPromise');
+var Subscriber_1 = require('../Subscriber');
 var tryCatch_1 = require('../util/tryCatch');
+var isPromise_1 = require('../util/isPromise');
 var errorObject_1 = require('../util/errorObject');
-var OuterSubscriber_1 = require('../OuterSubscriber');
-var subscribeToResult_1 = require('../util/subscribeToResult');
 function throttle(durationSelector) {
     return this.lift(new ThrottleOperator(durationSelector));
 }
@@ -28,30 +29,52 @@ var ThrottleSubscriber = (function (_super) {
     }
     ThrottleSubscriber.prototype._next = function (value) {
         if (!this.throttled) {
+            var destination = this.destination;
             var duration = tryCatch_1.tryCatch(this.durationSelector)(value);
             if (duration === errorObject_1.errorObject) {
-                this.destination.error(errorObject_1.errorObject.e);
+                destination.error(errorObject_1.errorObject.e);
+                return;
             }
-            else {
-                this.add(this.throttled = subscribeToResult_1.subscribeToResult(this, duration));
-                this.destination.next(value);
+            if (isPromise_1.isPromise(duration)) {
+                duration = fromPromise_1.PromiseObservable.create(duration);
             }
+            this.add(this.throttled = duration._subscribe(new ThrottleDurationSelectorSubscriber(this)));
+            destination.next(value);
         }
     };
-    ThrottleSubscriber.prototype._unsubscribe = function () {
+    ThrottleSubscriber.prototype._error = function (err) {
+        this.clearThrottle();
+        _super.prototype._error.call(this, err);
+    };
+    ThrottleSubscriber.prototype._complete = function () {
+        this.clearThrottle();
+        _super.prototype._complete.call(this);
+    };
+    ThrottleSubscriber.prototype.clearThrottle = function () {
         var throttled = this.throttled;
         if (throttled) {
+            throttled.unsubscribe();
             this.remove(throttled);
             this.throttled = null;
-            throttled.unsubscribe();
         }
     };
-    ThrottleSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex) {
-        this._unsubscribe();
-    };
-    ThrottleSubscriber.prototype.notifyComplete = function () {
-        this._unsubscribe();
-    };
     return ThrottleSubscriber;
-})(OuterSubscriber_1.OuterSubscriber);
+})(Subscriber_1.Subscriber);
+var ThrottleDurationSelectorSubscriber = (function (_super) {
+    __extends(ThrottleDurationSelectorSubscriber, _super);
+    function ThrottleDurationSelectorSubscriber(parent) {
+        _super.call(this, null);
+        this.parent = parent;
+    }
+    ThrottleDurationSelectorSubscriber.prototype._next = function (unused) {
+        this.parent.clearThrottle();
+    };
+    ThrottleDurationSelectorSubscriber.prototype._error = function (err) {
+        this.parent.error(err);
+    };
+    ThrottleDurationSelectorSubscriber.prototype._complete = function () {
+        this.parent.clearThrottle();
+    };
+    return ThrottleDurationSelectorSubscriber;
+})(Subscriber_1.Subscriber);
 //# sourceMappingURL=throttle.js.map
