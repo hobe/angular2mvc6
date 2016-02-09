@@ -1,6 +1,7 @@
 # angular2mvc6
 Visual Studio 2015 Angular2 (Beta 03) Sample with MVC6 (ASP.NET Core, formerly known as ASP.NET 5 or ASP.NET vNext)
 
+Live Demo: http://ng2mvc6.azurewebsites.net (soon available)
 
 Features:
 * Anguar2 UI Routing
